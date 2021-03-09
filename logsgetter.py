@@ -1,6 +1,7 @@
 import requests
+from requests.exceptions import HTTPError
 import logging
-from datetime import date
+from datetime import date, datetime
 
 LOGS_URL = 'http://www.dsdev.tech/logs/'
 
@@ -13,20 +14,47 @@ logger.addHandler(handler)
 class LogsGetter:
     def __init__(self, url: str):
         self.url = url
+        self.logs = []
 
     def get_logs(self, date: date):
         logs = self._request_logs_from_server(date)
-        logs = self._sort_logs_by_date()
+        self._parse_logs(logs)
+        self._sort_logs_by_date()
 
     def _request_logs_from_server(self, date: date):
         date_formatted = date.strftime('%Y%m%d')
         url = '{}{}'.format(self.url, date_formatted)
-        logs = requests.get(url).json()
-        logger.info(f'Получены логи за {date.strftime("%Y/%m/%d")}')
-        return logs
-    
+        try:
+            logs = requests.get(url).json()
+        except HTTPError as e:
+            logger.error(f'При запросе логов произошла ошибка: {e}')
+            # выбросить исключение наружу класса
+        else:
+            logger.info(f'Получены логи за {date.strftime("%Y/%m/%d")}')
+            return logs
+
+    def _parse_logs(self, logs):
+        logs = logs['logs']
+        for entry in logs:
+            created = entry['created_at']
+            first_name, second_name = entry['first_name'], entry['second_name']
+            message = entry['message']
+            user_id = entry['user_id']
+            entry_obj = LogEntry(created, first_name, second_name, message, user_id)
+            self.logs.append(entry_obj)
+        logger.info(f'Всего записей: {len(self.logs)}')
+
     def _sort_logs_by_date(self):
         pass
+
+
+class LogEntry():
+    def __init__(self, created: str, first_name=None, second_name=None, message=None, user_id=None):
+        self.created = datetime.fromisoformat(created)
+        self.first_name = first_name
+        self.second_name = second_name
+        self.message = message
+        self.user_id = int(user_id)
 
 
 def main():
@@ -35,5 +63,5 @@ def main():
     getter.get_logs(logs_date)
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     main()

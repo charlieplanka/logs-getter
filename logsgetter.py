@@ -3,17 +3,12 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 import requests
 from requests.exceptions import HTTPError
-import logging
+from logger import logger
 from datetime import date, datetime
 import random
 
 LOGS_URL = 'http://www.dsdev.tech/logs/'
 DB_CONN_STR = 'postgresql+psycopg2://graffit:graffit@localhost/graffit_logs'
-
-logger = logging.getLogger(__name__)  # где уместнее настраивать логирование?
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-logger.addHandler(handler)
 
 Base = declarative_base()
 
@@ -21,45 +16,77 @@ Base = declarative_base()
 class LogsGetter:
     def __init__(self, url: str, db_connection_string: str):
         self.url = url
-        self.logs = []  # хранить как параметр объекта или передавать из функции в фцнкцию?
         self.db_string = db_connection_string
+        self.logs = []
 
-    def get_logs(self, date: date):
-        logs = self._request_logs_from_server(date)
-        self._parse_logs(logs)
+    def get_logs(self, log_date: date):
+        if not isinstance(log_date, date):
+            raise TypeError('Parameter "log_date" should be datetime.date')  # задокументировать
+
+        try:
+            logs = self._request_logs_from_server(log_date)
+        except HTTPError as e:
+            logger.error(f'An HTTP-error occured: {e}')
+            return  # нужно ли прокидывать ошибку наружу?
+        except RequestError as e:
+            logger.error(f'An error occured: {e}')
+            return
+
+        try:
+            self._parse_logs(logs)
+        except LogsParsingError as e:
+            logger.error(f'Cannot parse logs: {e}')
+            return
+
         self._sort_logs_by_date()
         self._save_logs_to_DB()
 
     def _request_logs_from_server(self, date: date):
-        logger.info('Получаем логи с сервера..')
+        logger.info(f'Requesting {date} logs from server..')
         date_formatted = date.strftime('%Y%m%d')
         url = '{}{}'.format(self.url, date_formatted)
-        try:
-            logs = requests.get(url).json()
-        except HTTPError as e:
-            logger.error(f'При запросе логов произошла ошибка: {e}')
-            # выбросить исключение наружу класса
+        response = requests.get(url)
+        response.raise_for_status()
+        logs = response.json()
+        error = logs['error']
+        if error:
+            raise RequestError(error)
         else:
-            logger.info(f'Получены логи за {date.strftime("%Y/%m/%d")}')
+            logger.info('Received successfully')
             return logs
 
-    def _parse_logs(self, logs):
-        logs = logs['logs']
+    def _parse_logs(self, logs: dict):
+        try:
+            logs = logs['logs']
+        except KeyError as e:
+            raise LogsParsingError(f'no key {e}')  # нужен ли здесь эксепшн?
+
         for entry in logs:
-            created = entry['created_at']
+            try:
+                created = entry['created_at']
+            except KeyError as e:
+                logger.debug(entry)
+                raise LogsParsingError(f'no required field {e}')
+
+            # как обрабатывать случаи пропуска необязательных полей?
             first_name, second_name = entry['first_name'], entry['second_name']
             message = entry['message']
             user_id = entry['user_id']
+
+            # logger.warning(f'В логе за {created} отсутствуют некоторые необязательные поля')
+            # logger.debug(f'Отсуствует поле {e}')
+
             entry_obj = LogEntry(created, first_name, second_name, message, user_id)
             self.logs.append(entry_obj)
-        logger.info(f'Всего записей: {len(self.logs)}')
+        logger.info(f'Total records: {len(self.logs)}')
 
     def _sort_logs_by_date(self):
         self.logs = LogsGetter.quick_sorting(self.logs)
 
     def _save_logs_to_DB(self):
-        logger.info('Сохраняем логи в базу..')
+        logger.info('Saving entries to DB..')
         session = self._connect_to_DB()
+        # добавить роллбек
         for entry in self.logs:
             db_entry = LogEntryDB(
                 created=entry.created,
@@ -69,8 +96,9 @@ class LogsGetter:
                 user_id=entry.user_id
                 )
             logger.debug(db_entry)
+            session.add(db_entry)
         session.commit()
-        logger.info('Логи успешно записаны в базу')
+        logger.info('Saved successfully')
 
     def _connect_to_DB(self):
         engine = create_engine(self.db_string)
@@ -79,7 +107,7 @@ class LogsGetter:
         return Session()
 
     @staticmethod
-    def quick_sorting(logs):
+    def quick_sorting(logs: list):
         if len(logs) <= 1:
             return logs
         else:
@@ -116,7 +144,15 @@ class LogEntryDB(Base):
     user_id = Column(Integer)
 
     def __repr__(self):
-        return f'<Запись создана {self.created}, пользователь: {self.first_name} {self.second_name}, USER ID: {self.user_id}>'
+        return f'<{self.created}, user: {self.first_name} {self.second_name}, ID: {self.user_id}>'
+
+
+class LogsParsingError(Exception):
+    pass
+
+
+class RequestError(Exception):
+    pass
 
 
 def main():

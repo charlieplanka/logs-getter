@@ -2,6 +2,7 @@ import requests
 from requests.exceptions import HTTPError
 import logging
 from datetime import date, datetime
+import random
 
 LOGS_URL = 'http://www.dsdev.tech/logs/'
 
@@ -14,7 +15,7 @@ logger.addHandler(handler)
 class LogsGetter:
     def __init__(self, url: str):
         self.url = url
-        self.logs = []
+        self.logs = [] # хранить как параметр объекта или передавать из функции в фцнкцию?
 
     def get_logs(self, date: date):
         logs = self._request_logs_from_server(date)
@@ -22,6 +23,7 @@ class LogsGetter:
         self._sort_logs_by_date()
 
     def _request_logs_from_server(self, date: date):
+        logger.info('Получаем логи с сервера..')
         date_formatted = date.strftime('%Y%m%d')
         url = '{}{}'.format(self.url, date_formatted)
         try:
@@ -45,7 +47,25 @@ class LogsGetter:
         logger.info(f'Всего записей: {len(self.logs)}')
 
     def _sort_logs_by_date(self):
-        pass
+        self.logs = LogsGetter.quick_sorting(self.logs)
+
+    @staticmethod
+    def quick_sorting(logs):
+        if len(logs) <= 1:
+            return logs
+        else:
+            reference = random.choice(logs)
+            less = []
+            greater = []
+            equall = []
+            for log in logs:
+                if log.created < reference.created:
+                    less.append(log)
+                elif log.created > reference.created:
+                    greater.append(log)
+                elif log.created == reference.created:
+                    equall.append(log)
+            return LogsGetter.quick_sorting(less) + equall + LogsGetter.quick_sorting(greater)
 
 
 class LogEntry():

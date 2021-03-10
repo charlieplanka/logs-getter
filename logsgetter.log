@@ -81,3 +81,23 @@
 2021-03-10 20:46:48,427 - INFO - Total records: 457
 2021-03-10 20:46:48,486 - INFO - Saving entries to DB..
 2021-03-10 20:46:48,634 - INFO - All entries saved successfully
+2021-03-10 20:53:58,877 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:53:58,881 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 20:53:59,402 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 197916
+2021-03-10 20:53:59,680 - INFO - Total records: 540
+2021-03-10 20:53:59,682 - INFO - Saving entries to DB..
+2021-03-10 20:53:59,826 - INFO - All entries saved successfully
+2021-03-10 20:59:05,860 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:59:05,860 - INFO - Total records: 1
+2021-03-10 20:59:05,904 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:59:05,905 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:59:05,947 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:59:05,948 - DEBUG - There are no logs for requested date
+2021-03-10 20:59:05,991 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:59:05,991 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:59:10,974 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:59:10,977 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 20:59:11,478 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 195384
+2021-03-10 20:59:11,771 - INFO - Total records: 528
+2021-03-10 20:59:11,772 - INFO - Saving entries to DB..
+2021-03-10 20:59:11,925 - INFO - All entries saved successfully

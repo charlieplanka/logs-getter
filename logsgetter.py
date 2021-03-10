@@ -1,17 +1,17 @@
+from datetime import date, datetime
+import random
+import json
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 import requests
 from requests.exceptions import HTTPError
 from logger import logger
-from datetime import date, datetime
-import random
-import json
 
 LOGS_URL = 'http://www.dsdev.tech/logs/'
 DB_CONN_STR = 'postgresql+psycopg2://graffit:graffit@localhost/graffit_logs'
 
-Base = declarative_base()
+BASE = declarative_base()
 
 
 class LogEntry:
@@ -38,7 +38,7 @@ class LogsGetter:
 
         # prepare ORM
         engine = create_engine(self._db_string)
-        Base.metadata.create_all(engine)
+        BASE.metadata.create_all(engine)
         self._sessionmaker = sessionmaker(engine)
 
     def get_logs(self, log_date: date):
@@ -178,7 +178,7 @@ class LogsGetter:
         session = self._connect_to_DB()
         try:
             for entry in logs:
-                db_entry = self._create_orm_object_from_entry(entry)
+                db_entry = LogsGetter._create_orm_object_from_entry(entry)
                 session.add(db_entry)
             session.commit()
             logger.info('All entries saved successfully')
@@ -189,24 +189,6 @@ class LogsGetter:
             raise LogsGetterError(msg)
         finally:
             session.close()
-
-    def _create_orm_object_from_entry(self, entry: LogEntry):
-        '''Creates ORM object from entry.
-
-        Args:
-            entry: LogEntry object.
-
-        Returns:
-            LogEntryDB object.
-        '''
-        db_entry = LogEntryDB(
-            created=entry.created,
-            first_name=entry.first_name,
-            second_name=entry.second_name,
-            message=entry.message,
-            user_id=entry.user_id
-        )
-        return db_entry
 
     def _connect_to_DB(self):
         '''Connects to database.
@@ -255,8 +237,27 @@ class LogsGetter:
                     equall.append(log)
             return LogsGetter._sort_logs_by_date(less) + equall + LogsGetter._sort_logs_by_date(greater)
 
+    @staticmethod
+    def _create_orm_object_from_entry(entry: LogEntry):
+        '''Creates ORM object from entry.
 
-class LogEntryDB(Base):
+        Args:
+            entry: LogEntry object.
+
+        Returns:
+            LogEntryDB object.
+        '''
+        db_entry = LogEntryDB(
+            created=entry.created,
+            first_name=entry.first_name,
+            second_name=entry.second_name,
+            message=entry.message,
+            user_id=entry.user_id
+        )
+        return db_entry
+
+
+class LogEntryDB(BASE):
     '''ORM class representing table with log entries.
     '''
     __tablename__ = 'logs'

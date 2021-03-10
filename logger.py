@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger()  # где уместнее настраивать логирование?
+logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler()

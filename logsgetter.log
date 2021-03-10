@@ -1,0 +1,12 @@
+2021-03-10 18:59:14,274 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 18:59:14,281 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 18:59:14,784 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 163725
+2021-03-10 18:59:15,056 - INFO - Total records: 453
+2021-03-10 18:59:15,061 - INFO - Saving entries to DB..
+2021-03-10 18:59:15,491 - INFO - All entries saved successfully
+2021-03-10 18:59:27,617 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 18:59:27,623 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 18:59:28,120 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 170460
+2021-03-10 18:59:28,385 - INFO - Total records: 470
+2021-03-10 18:59:28,390 - INFO - Saving entries to DB..
+2021-03-10 18:59:28,848 - INFO - All entries saved successfully

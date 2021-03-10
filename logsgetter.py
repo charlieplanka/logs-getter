@@ -6,6 +6,7 @@ from requests.exceptions import HTTPError
 from logger import logger
 from datetime import date, datetime
 import random
+import json
 
 LOGS_URL = 'http://www.dsdev.tech/logs/'
 DB_CONN_STR = 'postgresql+psycopg2://graffit:graffit@localhost/graffit_logs'
@@ -24,8 +25,9 @@ class LogEntry:
 
 class LogsGetter:
     def __init__(self, url: str, db_connection_string: str):
-        self.url = url
-        self.db_string = db_connection_string
+        self._url = url
+        self._db_string = db_connection_string
+        self._http_requester = HttpRequester()
 
     def get_logs(self, log_date: date):
         if not isinstance(log_date, date):
@@ -39,17 +41,16 @@ class LogsGetter:
     def _request_logs_from_server(self, date: date):
         logger.info(f'Requesting {date} logs from server..')
         date_formatted = date.strftime('%Y%m%d')
-        url = '{}{}'.format(self.url, date_formatted)
+        url = '{}{}'.format(self._url, date_formatted)
 
         try:
-            response = requests.get(url)
-            response.raise_for_status()
+            response = self._http_requester.get_content(url)
         except HTTPError as e:
             msg = f'An HTTP-error occurred: {e}'
             logger.error(msg)
             raise LogsGetterError(msg)
 
-        logs = response.json()
+        logs = json.loads(response)
         error = logs.get('error', 'no error')
         if error == 'no error':
             logger.warning('No "error" key in response')
@@ -73,7 +74,7 @@ class LogsGetter:
             created = entry.get('created_at')
             if not created:
                 msg = 'No "created_at" field for entry. This field is required. Entry skipped'
-                logger.warning(msg)
+                logger.error(msg)
                 logger.debug(entry)
                 continue
 
@@ -84,7 +85,14 @@ class LogsGetter:
                 logger.warning(f'Some optional fields are absent for entry {created}')
                 logger.debug(entry)
 
-            entry_obj = LogEntry(created, first_name, second_name, message, user_id)
+            try:
+                entry_obj = LogEntry(created, first_name, second_name, message, user_id)
+            except ValueError as e:
+                msg = f'An error occured while parsing: {e}. Entry skipped'
+                logger.error(msg)
+                logger.debug(entry)
+                continue
+
             parsed.append(entry_obj)
 
         logger.info(f'Total records: {len(parsed)}')
@@ -136,7 +144,7 @@ class LogsGetter:
         return db_entry
 
     def _connect_to_DB(self):
-        engine = create_engine(self.db_string)
+        engine = create_engine(self._db_string)
         Base.metadata.create_all(engine)
         Session = sessionmaker(engine)
         return Session()
@@ -153,6 +161,13 @@ class LogEntryDB(Base):
 
     def __repr__(self):
         return f'<{self.created}, user: {self.first_name} {self.second_name}, ID: {self.user_id}>'
+
+
+class HttpRequester:
+    def get_content(self, url: str):
+        resp = requests.get(url)
+        resp.raise_for_status()
+        return resp.content
 
 
 class LogsGetterError(Exception):

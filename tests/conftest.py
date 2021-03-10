@@ -24,7 +24,7 @@ mock_content_no_logs = '{"error":""}'
 mock_content_empty_logs = '{"error":"", "logs": []}'
 
 
-class MockHttpRequestor():
+class MockHttpRequester():
     def __init__(self, content):
         self._content = content
 
@@ -33,7 +33,7 @@ class MockHttpRequestor():
 
 
 def contruct_getter_with_mock(mock_content):
-    mock = MockHttpRequestor(mock_content)
+    mock = MockHttpRequester(mock_content)
     getter = LogsGetter(LOGS_URL, DB_CONN_STR)
     getter._http_requester = mock
     return getter

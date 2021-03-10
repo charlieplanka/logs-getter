@@ -10,3 +10,74 @@
 2021-03-10 18:59:28,385 - INFO - Total records: 470
 2021-03-10 18:59:28,390 - INFO - Saving entries to DB..
 2021-03-10 18:59:28,848 - INFO - All entries saved successfully
+2021-03-10 20:30:11,038 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:30:11,061 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 20:30:11,555 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 179115
+2021-03-10 20:30:11,826 - INFO - Total records: 492
+2021-03-10 20:30:11,828 - INFO - Saving entries to DB..
+2021-03-10 20:30:11,962 - INFO - All entries saved successfully
+2021-03-10 20:34:02,207 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:34:02,208 - INFO - Total records: 1
+2021-03-10 20:34:02,250 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:34:02,251 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:34:02,295 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:34:02,296 - DEBUG - There are no logs for requested date
+2021-03-10 20:34:02,339 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:34:02,339 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:35:33,815 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:35:33,818 - DEBUG - Starting new HTTPS connection (1): api.npoint.io:443
+2021-03-10 20:35:34,566 - DEBUG - https://api.npoint.io:443 "GET /d0c3485b57308c20a8fc20210123 HTTP/1.1" 500 23
+2021-03-10 20:35:34,574 - ERROR - An HTTP-error occurred: 500 Server Error: Internal Server Error for url: https://api.npoint.io/d0c3485b57308c20a8fc20210123
+2021-03-10 20:36:40,235 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:36:40,238 - DEBUG - Starting new HTTPS connection (1): api.npoint.io:443
+2021-03-10 20:36:41,041 - DEBUG - https://api.npoint.io:443 "GET /d0c3485b57308c20a8fc20210123 HTTP/1.1" 500 23
+2021-03-10 20:36:41,044 - ERROR - An HTTP-error occurred: 500 Server Error: Internal Server Error for url: https://api.npoint.io/d0c3485b57308c20a8fc20210123
+2021-03-10 20:39:06,136 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:39:06,139 - DEBUG - Starting new HTTPS connection (1): api.npoint.io:443
+2021-03-10 20:39:06,774 - DEBUG - https://api.npoint.io:443 "GET /d0c3485b57308c20a8fc HTTP/1.1" 200 110
+2021-03-10 20:39:06,778 - WARNING - No "error" key in response
+2021-03-10 20:39:06,778 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:41:37,460 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:41:37,461 - INFO - Total records: 1
+2021-03-10 20:41:37,511 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:41:37,511 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:41:37,555 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:41:37,556 - DEBUG - There are no logs for requested date
+2021-03-10 20:41:37,719 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:41:37,719 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:43:11,331 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:11,332 - INFO - Total records: 1
+2021-03-10 20:43:11,376 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:11,377 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:43:11,420 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:11,421 - DEBUG - There are no logs for requested date
+2021-03-10 20:43:11,465 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:11,465 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:43:44,924 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:44,927 - INFO - Total records: 1
+2021-03-10 20:43:44,970 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:44,971 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:43:45,143 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:45,144 - DEBUG - There are no logs for requested date
+2021-03-10 20:43:45,187 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:43:45,187 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:46:10,013 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:46:10,014 - INFO - Total records: 1
+2021-03-10 20:46:10,056 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:46:10,057 - ERROR - Failed to get logs: no "logs" key in response
+2021-03-10 20:46:10,099 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:46:10,099 - DEBUG - There are no logs for requested date
+2021-03-10 20:46:10,143 - INFO - Requesting 2021-01-01 logs from server..
+2021-03-10 20:46:10,143 - ERROR - Server responded with an error: Something went wrong
+2021-03-10 20:46:12,465 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:46:12,469 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 20:46:12,957 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 174490
+2021-03-10 20:46:13,235 - INFO - Total records: 472
+2021-03-10 20:46:13,237 - INFO - Saving entries to DB..
+2021-03-10 20:46:13,374 - INFO - All entries saved successfully
+2021-03-10 20:46:47,690 - INFO - Requesting 2021-01-23 logs from server..
+2021-03-10 20:46:47,694 - DEBUG - Starting new HTTP connection (1): www.dsdev.tech:80
+2021-03-10 20:46:48,146 - DEBUG - http://www.dsdev.tech:80 "GET /logs/20210123 HTTP/1.1" 200 168109
+2021-03-10 20:46:48,427 - INFO - Total records: 457
+2021-03-10 20:46:48,486 - INFO - Saving entries to DB..
+2021-03-10 20:46:48,634 - INFO - All entries saved successfully

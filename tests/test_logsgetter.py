@@ -24,10 +24,10 @@ def test_parse_logs_no_logs(logs_no_logs):
 
 
 def test_parse_logs_empty_logs(logs_empty_logs):
-    '''Tests if SystemExit is raised when 'logs' key is empty.'''
+    '''Tests if empty list is returned when 'logs' key is empty.'''
     getter, logs = logs_empty_logs
-    with pytest.raises(SystemExit):
-        getter._parse_logs(logs)
+    logs = getter._parse_logs(logs)
+    assert logs == []
 
 
 def test_request_logs_from_server_error(getter_error_in_response):

@@ -36,6 +36,11 @@ class LogsGetter:
         self._db_string = db_connection_string
         self._http_requester = HttpRequester()
 
+        # prepare ORM
+        engine = create_engine(self._db_string)
+        Base.metadata.create_all(engine)
+        self._sessionmaker = sessionmaker(engine)
+
     def get_logs(self, log_date: date):
         '''Gets logs for a certain date from server and saves to DB.
 
@@ -49,11 +54,13 @@ class LogsGetter:
             TypeError: If log_date is not datetime.date instance.
         '''
         if not isinstance(log_date, date):
-            raise TypeError('Parameter "log_date" should be datetime.date object')
+            raise TypeError('Parameter "log_date" should be datetime.date instance')
 
         logs = self._request_logs_from_server(log_date)
         parsed_logs = self._parse_logs(logs)
-        sorted_logs = self._sort_logs_by_date(parsed_logs)
+        if not parsed_logs:
+            return
+        sorted_logs = LogsGetter._sort_logs_by_date(parsed_logs)
         self._save_logs_to_DB(sorted_logs)
 
     def _request_logs_from_server(self, date: date):
@@ -80,8 +87,8 @@ class LogsGetter:
             raise LogsGetterError(msg)
 
         logs = json.loads(response)
-        error = logs.get('error', 'no error')
-        if error == 'no error':
+        error = logs.get('error')
+        if error is None:
             logger.warning('No "error" key in response')
         elif error:
             msg = f'Server responded with an error: {error}'
@@ -101,17 +108,16 @@ class LogsGetter:
 
         Raises:
             LogsGetterError: If 'logs' key is absent in dictionary.
-            SystemExit: If there are no logs (key 'logs' is empty).
         '''
-        logs = logs.get('logs', 'no logs')
-        if logs == 'no logs':
+        logs = logs.get('logs')
+        if logs is None:
             msg = 'Failed to get logs: no "logs" key in response'
             logger.error(msg)
             raise LogsGetterError(msg)
         elif not logs:
             msg = 'There are no logs for requested date'
             logger.debug(msg)
-            raise SystemExit(msg)
+            return logs
 
         parsed = []
         for entry in logs:
@@ -137,7 +143,7 @@ class LogsGetter:
             msg = 'Entry field "created_at" is empty or absent. This field is required. Entry skipped'
             logger.error(msg)
             logger.debug(entry)
-            return
+            return None
 
         first_name, second_name = entry.get('first_name'), entry.get('second_name')
         message = entry.get('message')
@@ -152,34 +158,9 @@ class LogsGetter:
             msg = f'An error occured while parsing: {e}. Entry skipped'
             logger.error(msg)
             logger.debug(entry)
-            return
+            return None
 
         return entry_obj
-
-    def _sort_logs_by_date(self, logs: list):
-        '''Sorts entry objects by date in ascending order using quick sorting algorithm.
-
-        Args:
-            logs: List with LogEntry objects.
-
-        Returns:
-            Sorted list of LogEntry objects.
-        '''
-        if len(logs) <= 1:
-            return logs
-        else:
-            reference = random.choice(logs)
-            less = []
-            greater = []
-            equall = []
-            for log in logs:
-                if log.created < reference.created:
-                    less.append(log)
-                elif log.created > reference.created:
-                    greater.append(log)
-                elif log.created == reference.created:
-                    equall.append(log)
-            return self._sort_logs_by_date(less) + equall + self._sort_logs_by_date(greater)
 
     def _save_logs_to_DB(self, logs: list):
         '''Saves entries to database.
@@ -233,10 +214,7 @@ class LogsGetter:
         Returns:
             DB session object.
         '''
-        engine = create_engine(self._db_string)
-        Base.metadata.create_all(engine)
-        Session = sessionmaker(engine)
-        return Session()
+        return self._sessionmaker()
 
     def _construct_request_url(self, date: date):
         '''Constructs URL for request using date.
@@ -250,6 +228,32 @@ class LogsGetter:
         date_formatted = date.strftime('%Y%m%d')
         url = '{}{}'.format(self._url, date_formatted)
         return url
+
+    @staticmethod
+    def _sort_logs_by_date(logs: list):
+        '''Sorts entry objects by date in ascending order using quick sorting algorithm.
+
+        Args:
+            logs: List with LogEntry objects.
+
+        Returns:
+            Sorted list of LogEntry objects.
+        '''
+        if len(logs) <= 1:
+            return logs
+        else:
+            reference = random.choice(logs)
+            less = []
+            greater = []
+            equall = []
+            for log in logs:
+                if log.created < reference.created:
+                    less.append(log)
+                elif log.created > reference.created:
+                    greater.append(log)
+                elif log.created == reference.created:
+                    equall.append(log)
+            return LogsGetter._sort_logs_by_date(less) + equall + LogsGetter._sort_logs_by_date(greater)
 
 
 class LogEntryDB(Base):

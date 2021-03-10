@@ -11,8 +11,15 @@ OK_USER_ID = '530527'
 TEST_DATE = date(2021, 1, 1)
 
 mock_content_error = '{"error":"Something went wrong","logs":[]}'
-mock_content_ok = '{"error":"","logs":[{"created_at":"%s","first_name":"%s","message":"%s","second_name":"%s","user_id":"%s"}]}' % (
-    OK_CREATED, OK_FIRST_NAME, OK_MESSAGE, OK_SECOND_NAME, OK_USER_ID)
+mock_content_ok = '{"error":"","logs":[{"created_at":"%s","first_name":"%s", \
+"message":"%s","second_name":"%s","user_id":"%s"}]}' % (
+    OK_CREATED,
+    OK_FIRST_NAME,
+    OK_MESSAGE,
+    OK_SECOND_NAME,
+    OK_USER_ID
+    )
+
 mock_content_no_logs = '{"error":""}'
 mock_content_empty_logs = '{"error":"", "logs": []}'
 

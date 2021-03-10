@@ -8,10 +8,13 @@ OK_SECOND_NAME = '\u0428\u0435\u0441\u0442\u0430\u043a\u043e\u0432'
 OK_MESSAGE = 'Leave now and never come back'
 OK_USER_ID = '530527'
 
+TEST_DATE = date(2021, 1, 1)
+
 mock_content_error = '{"error":"Something went wrong","logs":[]}'
 mock_content_ok = '{"error":"","logs":[{"created_at":"%s","first_name":"%s","message":"%s","second_name":"%s","user_id":"%s"}]}' % (
     OK_CREATED, OK_FIRST_NAME, OK_MESSAGE, OK_SECOND_NAME, OK_USER_ID)
 mock_content_no_logs = '{"error":""}'
+mock_content_empty_logs = '{"error":"", "logs": []}'
 
 
 class MockHttpRequestor():
@@ -30,20 +33,24 @@ def contruct_getter_with_mock(mock_content):
 
 
 @pytest.fixture
-def getter_error_in_response(request):
-    getter = contruct_getter_with_mock(mock_content_error)
-    return getter
-
-
-@pytest.fixture
 def logs_ok(request):
     getter = contruct_getter_with_mock(mock_content_ok)
-    logs_date = date(2021, 1, 1)
-    return getter, getter._request_logs_from_server(logs_date)
+    return getter, getter._request_logs_from_server(TEST_DATE)
 
 
 @pytest.fixture
 def logs_no_logs(request):
     getter = contruct_getter_with_mock(mock_content_no_logs)
-    logs_date = date(2021, 1, 1)
-    return getter, getter._request_logs_from_server(logs_date)
+    return getter, getter._request_logs_from_server(TEST_DATE)
+
+
+@pytest.fixture
+def logs_empty_logs(request):
+    getter = contruct_getter_with_mock(mock_content_empty_logs)
+    return getter, getter._request_logs_from_server(TEST_DATE)
+
+
+@pytest.fixture
+def getter_error_in_response(request):
+    getter = contruct_getter_with_mock(mock_content_error)
+    return getter

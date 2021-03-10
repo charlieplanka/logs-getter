@@ -1,16 +1,11 @@
 from logsgetter import LogsGetterError
-from conftest import OK_CREATED, OK_FIRST_NAME, OK_MESSAGE, OK_SECOND_NAME, OK_USER_ID
-from datetime import date, datetime
+from conftest import OK_CREATED, OK_FIRST_NAME, OK_MESSAGE, OK_SECOND_NAME, OK_USER_ID, TEST_DATE
+from datetime import datetime
 import pytest
 
 
-def test_request_logs_from_server_error(getter_error_in_response):
-    logs_date = date(2021, 1, 23)
-    with pytest.raises(LogsGetterError):
-        getter_error_in_response._request_logs_from_server(logs_date)
-
-
 def test_parse_logs_ok(logs_ok):
+    '''Tests if entry is parsed correctly.'''
     getter, logs = logs_ok
     parsed = getter._parse_logs(logs)
     entry = parsed[0]
@@ -22,6 +17,20 @@ def test_parse_logs_ok(logs_ok):
 
 
 def test_parse_logs_no_logs(logs_no_logs):
+    '''Tests if LogsGetterError is raised when 'logs' key is absent.'''
     getter, logs = logs_no_logs
     with pytest.raises(LogsGetterError):
         getter._parse_logs(logs)
+
+
+def test_parse_logs_empty_logs(logs_empty_logs):
+    '''Tests if SystemExit is raised when 'logs' key is empty.'''
+    getter, logs = logs_empty_logs
+    with pytest.raises(SystemExit):
+        getter._parse_logs(logs)
+
+
+def test_request_logs_from_server_error(getter_error_in_response):
+    '''Tests if LogsGetterError is raised when 'error' key has content.'''
+    with pytest.raises(LogsGetterError):
+        getter_error_in_response._request_logs_from_server(TEST_DATE)

@@ -116,7 +116,7 @@ class LogsGetter:
             raise LogsGetterError(msg)
         elif not logs:
             msg = 'There are no logs for requested date'
-            logger.debug(msg)
+            logger.info(msg)
             return logs
 
         parsed = []
